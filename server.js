@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const routes = require("./routes/routes");
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 // CORS, for annoying cross site bullshit
 app.use(cors());
+app.use(cookieParser());
 
 // Main Node Server //
 //////////////////////

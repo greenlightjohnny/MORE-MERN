@@ -3,6 +3,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { registerVal, loginVal } = require("../util/validation");
 const jwt = require("jsonwebtoken");
+const auth = require("../middleware/checkAuth");
 
 // ROUTES //
 ///////////
@@ -60,7 +61,10 @@ router.post("/login", async (req, res) => {
     return res.status(400).json({ msg: "Email or password is incorrect" });
   }
 
-  const comparePasswords = bcrypt.compare(req.body.password, user.password);
+  const comparePasswords = await bcrypt.compare(
+    req.body.password,
+    user.password
+  );
 
   if (!comparePasswords) {
     return res.status(400).json({ msg: "Email or password is incorrect" });
@@ -68,7 +72,30 @@ router.post("/login", async (req, res) => {
 
   if (comparePasswords) {
     const jwtSecret = process.env.JWT_SECRET;
-    const token = jwt.sign({ _id: user._ID }, jwtSecret);
+    const token = jwt.sign({ id: user._id }, jwtSecret);
+
+    res.header("daisy", token);
+    res.cookie("daisy", token, { httpOnly: true, sameSite: true });
+    res.status(200).json({
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  }
+});
+
+// Delete account, private route, middleware protection.
+
+router.delete("/delete", auth, async (req, res) => {
+  try {
+    const deletedUser = await User.findByIdAndDelete(req.user);
+    console.log(deletedUser);
+    res.status(200).json(deletedUser);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
