@@ -1,6 +1,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const routes = require("./routes/routes");
+
 require("dotenv").config();
 
 const app = express();
@@ -32,3 +34,5 @@ mongoose.connect(
     console.log("Mongoose is ALIVE!");
   }
 );
+
+app.use("/api/v1/users", routes);

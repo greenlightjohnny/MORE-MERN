@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+
     minlength: 6,
   },
 
@@ -15,8 +15,12 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 5,
+    minlength: 6,
   },
 });
 
-module.exports;
+module.exports = User = mongoose.model("user", userSchema);
+
+// Or this Way:
+// const User = mongoose.model("User", UserSchema);
+// module.exports = User;
