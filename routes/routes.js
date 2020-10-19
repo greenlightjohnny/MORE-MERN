@@ -5,6 +5,9 @@ const { registerVal, loginVal } = require("../util/validation");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/checkAuth");
 const nodeMail = require("nodemailer");
+const emailCon = require("../util/sendcon");
+const sgMail = require("@sendgrid/mail");
+
 // ROUTES //
 ///////////
 // Each route takes in the req, res from the client, and uses a callback function to do something with that info
@@ -41,6 +44,25 @@ router.post("/register", async (req, res) => {
   // Attempt to save to MongoDB
   try {
     const saved = await user.save();
+    const jwtSecret = process.env.JWT_REG;
+    const token = jwt.sign({ id: saved._id }, jwtSecret);
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const msg = {
+      to: "castelloiv@gmail.com", // Change to your recipient
+      from: "totallylegitapp@outlook.com", // Change to your verified sender
+      subject: "Please confirm your email",
+      text: "and easy to do anywhere, even with Node.js",
+      html: `<strong> ${token}</strong>`,
+    };
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
     res.status(200).send({ user: user._id });
   } catch (err) {
     res.status(500).json({ msg: err });
@@ -134,5 +156,16 @@ router.get("/", auth, async (req, res) => {
 });
 
 /// Email conformation route;
+
+router.get("/confirm/:token", (req, res) => {
+  console.log("verr", req.query);
+  console.log("verr", req.params);
+  let token = req.params.token;
+  const verified = jwt.verify(token, process.env.JWT_REG);
+  if (!verified) {
+    return res.json("Wrong");
+  }
+  console.log("verrrr", verified);
+});
 
 module.exports = router;
