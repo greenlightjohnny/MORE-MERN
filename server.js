@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const routes = require("./routes/routes");
 const cookieParser = require("cookie-parser");
+mongoose.set("useFindAndModify", false);
 
 require("dotenv").config();
 

@@ -7,6 +7,7 @@ const auth = require("../middleware/checkAuth");
 const nodeMail = require("nodemailer");
 const emailCon = require("../util/sendcon");
 const sgMail = require("@sendgrid/mail");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 // ROUTES //
 ///////////
@@ -46,13 +47,14 @@ router.post("/register", async (req, res) => {
     const saved = await user.save();
     const jwtSecret = process.env.JWT_REG;
     const token = jwt.sign({ id: saved._id }, jwtSecret);
+    console.log("signup", token);
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
       to: "castelloiv@gmail.com", // Change to your recipient
       from: "totallylegitapp@outlook.com", // Change to your verified sender
       subject: "Please confirm your email",
       text: "and easy to do anywhere, even with Node.js",
-      html: `<strong> ${token}</strong>`,
+      html: `<strong> ${process.env.BASE_URL}/confirm/${token}</strong>`,
     };
     sgMail
       .send(msg)
@@ -157,15 +159,27 @@ router.get("/", auth, async (req, res) => {
 
 /// Email conformation route;
 
-router.get("/confirm/:token", (req, res) => {
-  console.log("verr", req.query);
+router.get("/confirm/:token", async (req, res) => {
   console.log("verr", req.params);
   let token = req.params.token;
-  const verified = jwt.verify(token, process.env.JWT_REG);
-  if (!verified) {
+
+  const verified1 = jwt.verify(token, process.env.JWT_REG);
+
+  console.log("xxxx", verified1.id);
+  if (!verified1) {
     return res.json("Wrong");
   }
-  console.log("verrrr", verified);
+
+  try {
+    const user = await User.findOneAndUpdate(
+      { _id: verified1.id },
+      { $set: { verified: true } },
+      { new: true }
+    );
+    res.status(200).send("ALIVE");
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
