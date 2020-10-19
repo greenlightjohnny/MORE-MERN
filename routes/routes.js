@@ -15,13 +15,16 @@ const auth = require("../middleware/checkAuth");
 router.post("/register", async (req, res) => {
   // Use Joi to validate client data
   const { error } = registerVal(req.body);
+  console.log("333", req.body);
   // If Joi returns an error, send error message to client and break loop
   if (error) {
-    return res.status(400).json({ msg: error.details[0].message });
+    console.log("4444", error.details[0].message);
+    return res.json({ msg: error.details[0].message });
   }
 
   // If there is no data val error, search DB fot see if the email is already registered. If so, return an error
   const alreadyReg = await User.findOne({ email: req.body.email });
+  console.log("555", alreadyReg);
   if (alreadyReg) {
     return res.status(400).json({ msg: "Password or email incorrect" });
   }
@@ -40,7 +43,7 @@ router.post("/register", async (req, res) => {
     const saved = await user.save();
     res.status(200).send({ user: user._id });
   } catch (err) {
-    res.status(400).json({ msg: err });
+    res.status(500).json({ msg: err });
   }
 });
 
@@ -54,7 +57,7 @@ router.post("/login", async (req, res) => {
 
   const { error } = loginVal(req.body);
   if (error) {
-    return res.status(400).json({ msg: "Email or Password incorrect" });
+    return res.status(400).json({ msg: "Email or password is incorrect" });
   }
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
@@ -81,7 +84,6 @@ router.post("/login", async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
-        email: user.email,
       },
     });
   }
