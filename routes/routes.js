@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { registerVal, loginVal } = require("../util/validation");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/checkAuth");
-
+const nodeMail = require("nodemailer");
 // ROUTES //
 ///////////
 // Each route takes in the req, res from the client, and uses a callback function to do something with that info
@@ -62,6 +62,11 @@ router.post("/login", async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return res.status(400).json({ msg: "Email or password is incorrect" });
+  }
+  if (!user.verified) {
+    return res
+      .status(400)
+      .json({ msg: "Please confirm email before logging in" });
   }
 
   const comparePasswords = await bcrypt.compare(
@@ -127,5 +132,7 @@ router.get("/", auth, async (req, res) => {
 
   res.json({ displayName: user.name, id: user._id });
 });
+
+/// Email conformation route;
 
 module.exports = router;
