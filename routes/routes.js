@@ -162,21 +162,33 @@ router.get("/", auth, async (req, res) => {
 router.get("/confirm/:token", async (req, res) => {
   console.log("verr", req.params);
   let token = req.params.token;
+  if (!token) {
+    return res.json(false);
+  }
 
-  const verified1 = jwt.verify(token, process.env.JWT_REG);
-
-  console.log("xxxx", verified1.id);
-  if (!verified1) {
-    return res.json("Wrong");
+  let legit;
+  try {
+    legit = jwt.verify(token, process.env.JWT_REG);
+  } catch (err) {
+    if (err instanceof jwt.JsonWebTokenError) {
+      return res
+        .status(401)
+        .json({
+          msg: "Invalid or expired token, please try registering again",
+        });
+    }
+    return res.status(400).send("Something else");
   }
 
   try {
     const user = await User.findOneAndUpdate(
-      { _id: verified1.id },
+      { _id: legit.id },
       { $set: { verified: true } },
       { new: true }
     );
-    res.status(200).send("ALIVE");
+    res
+      .status(200)
+      .send("Email confirmed! You wil be redirected to the login page");
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
