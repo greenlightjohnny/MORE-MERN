@@ -1,9 +1,10 @@
 const jwt = require("jsonwebtoken");
-
-const auth = (req, res, next) => {
-  console.log("666666666666", req.cookies);
+const parser = require("cookie-parser");
+const authCheck = (req, res, next) => {
+  console.log("any", req.cookies);
   try {
-    const token = req.header("daisy");
+    const token = req.cookies.daisy;
+    console.log("isit", token);
     if (!token) {
       return res.status(401).send("No token");
     }
@@ -14,11 +15,10 @@ const auth = (req, res, next) => {
       return res.status(401).send("Not a valid token");
     }
 
-    req.user = verified.id;
     next();
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
 };
 
-module.exports = auth;
+module.exports = authCheck;

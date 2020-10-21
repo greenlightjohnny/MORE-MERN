@@ -4,10 +4,10 @@ const bcrypt = require("bcrypt");
 const { registerVal, loginVal } = require("../util/validation");
 const jwt = require("jsonwebtoken");
 const auth = require("../middleware/checkAuth");
-const nodeMail = require("nodemailer");
-const emailCon = require("../util/sendcon");
+
 const sgMail = require("@sendgrid/mail");
-const ObjectId = require("mongoose").Types.ObjectId;
+
+const checkToken = require("../middleware/checkToken");
 
 // ROUTES //
 ///////////
@@ -46,7 +46,7 @@ router.post("/register", async (req, res) => {
   try {
     const saved = await user.save();
     const jwtSecret = process.env.JWT_REG;
-    const token = jwt.sign({ id: saved._id }, jwtSecret);
+    const token = jwt.sign({ id: saved._id }, jwtSecret, { expiresIn: 60 * 2 });
     console.log("signup", token);
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
@@ -54,7 +54,7 @@ router.post("/register", async (req, res) => {
       from: "totallylegitapp@outlook.com", // Change to your verified sender
       subject: "Please confirm your email",
       text: "and easy to do anywhere, even with Node.js",
-      html: `<strong> ${process.env.BASE_URL}/confirm/${token}</strong>`,
+      html: `<strong> http://localhost:3000/confirm/${token}</strong>`,
     };
     sgMail
       .send(msg)
@@ -106,7 +106,7 @@ router.post("/login", async (req, res) => {
     const jwtSecret = process.env.JWT_SECRET;
     const token = jwt.sign({ id: user._id }, jwtSecret);
 
-    res.header("daisy", token);
+    //res.header("daisy", token);
     res.cookie("daisy", token, { httpOnly: true, sameSite: true });
     res.status(200).json({
       token,
@@ -130,31 +130,42 @@ router.delete("/delete", auth, async (req, res) => {
   }
 });
 
-router.post("/isvalid", async (req, res) => {
-  try {
-    const token = req.header("daisy");
+// router.post("/isvalid", async (req, res) => {
+//   try {
+//     const token = req.header("daisy");
 
-    if (!token) {
-      return res.json(false);
-    }
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    if (!verified) {
-      return res.json("false");
-    }
-    const user = await User.findById(verified.id);
-    if (!user) {
-      return res.json(false);
-    }
-    return res.json(true);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+//     if (!token) {
+//       return res.json(false);
+//     }
+//     const verified = jwt.verify(token, process.env.JWT_SECRET);
+//     if (!verified) {
+//       return res.json("false");
+//     }
+//     const user = await User.findById(verified.id);
+//     if (!user) {
+//       return res.json(false);
+//     }
+//     return res.json({isAuthenticated: true});
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-router.get("/", auth, async (req, res) => {
-  const user = await User.findById(req.user);
+// router.get("/", auth, async (req, res) => {
+//   console.log("route hit");
+//   const user = await User.findById(req.user);
+//   console.log("route hit");
+//   res.json({
+//     isAuthenticated: true,
+//     user: user.name,
+//     displayName: user.name,
+//     id: user._id,
+//   });
+// });
 
-  res.json({ displayName: user.name, id: user._id });
+router.get("/auth", checkToken, (req, res) => {
+  console.log("hello", req.cookies);
+  res.status(200).json(true);
 });
 
 /// Email conformation route;
@@ -171,11 +182,9 @@ router.get("/confirm/:token", async (req, res) => {
     legit = jwt.verify(token, process.env.JWT_REG);
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError) {
-      return res
-        .status(401)
-        .json({
-          msg: "Invalid or expired token, please try registering again",
-        });
+      return res.status(401).json({
+        msg: "Invalid or expired token, please try registering again",
+      });
     }
     return res.status(400).send("Something else");
   }
@@ -192,6 +201,12 @@ router.get("/confirm/:token", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+//// Logout route
+router.post("/logout", (req, res) => {
+  res.clearCookie("daisy");
+  return res.status(200).send("Logged out");
 });
 
 module.exports = router;
