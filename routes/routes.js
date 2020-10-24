@@ -56,7 +56,7 @@ router.post("/register", async (req, res) => {
       from: "totallylegitapp@outlook.com", // Change to your verified sender
       subject: "Please confirm your email",
       text: "and easy to do anywhere, even with Node.js",
-      html: `<strong> http://localhost:3000/confirm/${token}</strong>`,
+      html: `<strong> https://bright-mern.netlify.app/confirm/${token}</strong>`,
     };
     sgMail
       .send(msg)
