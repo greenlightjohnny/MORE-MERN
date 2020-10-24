@@ -45,6 +45,6 @@ mongoose.connect(
 
 app.use("/api/v1/users", routes);
 
-app.get("/", (req, res) => {
-  res.send("Hello from Express!");
-});
+// app.get("/", (req, res) => {
+//   res.send("Hello from Express!");
+// });
