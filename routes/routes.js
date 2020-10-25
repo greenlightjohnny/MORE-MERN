@@ -46,6 +46,7 @@ router.post("/register", async (req, res) => {
   try {
     const saved = await user.save();
     const jwtSecret = process.env.JWT_REG;
+    const testSite = process.env.SITE;
     const token = jwt.sign({ id: saved._id }, jwtSecret, {
       expiresIn: 60 * 20,
     });
@@ -54,7 +55,7 @@ router.post("/register", async (req, res) => {
     const msg = {
       to: "castelloiv@gmail.com", // Change to your recipient
       from: "totallylegitapp@outlook.com", // Change to your verified sender
-      subject: `Hi ${req.body.name}`,
+      subject: `Hi ${testSite}`,
       text: `Click below to confirm your account! ${req.body.email}`,
       html: `<strong> ${process.env.SITE}/confirm/${token}</strong>`,
     };
