@@ -53,8 +53,8 @@ router.post("/register", async (req, res) => {
     console.log("signup", token);
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
-      to: "castelloiv@gmail.com", // Change to your recipient
-      from: "totallylegitapp@outlook.com", // Change to your verified sender
+      to: req.body.email,
+      from: "totallylegitapp@outlook.com",
       subject: `Hi ${testSite}`,
       text: `Click below to confirm your account! ${req.body.email}`,
       html: `<strong> ${process.env.SITE}/confirm/${token}</strong>`,
@@ -78,10 +78,6 @@ router.post("/register", async (req, res) => {
 // @Desc POST login route
 
 router.post("/login", async (req, res) => {
-  //validate
-  //search for user
-  //if user hash and compare passwords
-
   const { error } = loginVal(req.body);
   if (error) {
     return res.status(400).json({ msg: "Email or password is incorrect" });
@@ -109,7 +105,6 @@ router.post("/login", async (req, res) => {
     const jwtSecret = process.env.JWT_SECRET;
     const token = jwt.sign({ id: user._id }, jwtSecret);
 
-    //res.header("daisy", token);
     res.cookie("daisy", token, { httpOnly: true, sameSite: true });
     res.status(200).json({
       token,
