@@ -186,6 +186,7 @@ router.get("/confirm/:token", async (req, res) => {
     }
     return res.status(400).send("Something else");
   }
+  console.log("isitleg", legit);
 
   try {
     const user = await User.findOneAndUpdate(
@@ -199,6 +200,7 @@ router.get("/confirm/:token", async (req, res) => {
       .status(200)
       .send("Email confirmed! You wil be redirected to the login page");
   } catch (err) {
+    console.log("here", err.message);
     res.status(500).json({ error: err.message });
   }
 });
