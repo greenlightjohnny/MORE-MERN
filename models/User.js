@@ -21,6 +21,11 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6,
   },
+  createdAt: {
+    type: Date,
+    expires: 1000 * 60 * 2,
+    default: Date.now,
+  },
 });
 
 module.exports = User = mongoose.model("user", userSchema);
