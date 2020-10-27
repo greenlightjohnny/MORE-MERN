@@ -26,11 +26,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "hello",
   },
-  createdAt: {
+  expireAt: {
     type: Date,
 
     default: Date.now,
-    index: { expires: "2m" },
+    index: { expires: "60s" },
   },
 });
 
