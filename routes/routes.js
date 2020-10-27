@@ -195,7 +195,7 @@ router.get("/confirm/:token", async (req, res) => {
       { $unset: { expireAt: "" } },
       { new: true },
       (err, doc, raw) => {
-        blue = doc;
+        return console.log("&&&&", doc, err);
       }
     );
     console.log("######", user.verified);
