@@ -191,10 +191,10 @@ router.get("/confirm/:token", async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: legit.id },
       { $set: { verified: true } },
-      { $unset: { expireAt: 1 } },
+      { $unset: { expireAt: "" } },
       { new: true }
     );
-    console.log("######", user);
+    console.log("######", user.verified);
     res
       .status(200)
       .send("Email confirmed! You wil be redirected to the login page");
