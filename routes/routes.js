@@ -191,7 +191,7 @@ router.get("/confirm/:token", async (req, res) => {
     const user = await User.findOneAndUpdate(
       { _id: legit.id },
       { $set: { verified: true } },
-      { $unset: { createdAt: 1 } },
+      { $unset: { expiresAt: 1 } },
       { new: true }
     );
     console.log("######", user);
