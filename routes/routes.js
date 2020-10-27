@@ -186,20 +186,20 @@ router.get("/confirm/:token", async (req, res) => {
     }
     return res.status(400).send("Something else");
   }
-  console.log("isitleg", legit);
-  let blue = "hi";
+
   try {
     const user = await User.findOneAndUpdate(
       { _id: legit.id },
       { $set: { verified: true } },
-      { $unset: { expireAt: "" } },
-      { new: true },
-      (err, doc, raw) => {
-        return console.log("&&&&", doc, err);
-      }
+
+      { new: true }
     );
-    console.log("######", user.verified);
-    console.log("blue", blue);
+    const testU = await User.findOneAndUpdate(
+      { _id: legit.id },
+      { $unset: { expireAt: "" } },
+      { new: true }
+    );
+
     res
       .status(200)
       .send("Email confirmed! You wil be redirected to the login page");
