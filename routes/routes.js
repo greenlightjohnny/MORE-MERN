@@ -50,7 +50,7 @@ router.post("/register", async (req, res) => {
     const token = jwt.sign({ id: saved._id }, jwtSecret, {
       expiresIn: 60 * 20,
     });
-    console.log("signup", token);
+    console.log("%%%%%%%%%%%%", req.body.email);
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
       to: req.body.email,
