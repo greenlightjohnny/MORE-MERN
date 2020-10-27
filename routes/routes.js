@@ -55,9 +55,9 @@ router.post("/register", async (req, res) => {
     const msg = {
       to: req.body.email,
       from: "totallylegitapp@outlook.com",
-      subject: `Hi ${testSite}`,
+      subject: `Hi ${req.body.name}`,
       text: `Click below to confirm your account! ${req.body.email}`,
-      html: `<strong> ${process.env.SITE}/confirm/${token}</strong>`,
+      html: `<p> Please click <a href=${process.env.SITE}/confirm/${token}>here</a> to confirm your totally legit account</p>`,
     };
     sgMail
       .send(msg)
