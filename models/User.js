@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
 
     default: Date.now,
-    index: { expires: "60s" },
+    index: { expires: "180s" },
   },
 });
 
