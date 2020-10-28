@@ -46,8 +46,7 @@ router.post("/logout", (req, res) => {
   return res.status(200).send("Logged out");
 });
 router.post("/reset", reset_controller.reset_post);
-router.post("/reset/:token", reset_controller.reset_post_password);
-router.get("/reset/:token", reset_controller.reset_get);
+router.post("/resetform/:token", reset_controller.reset_post_password);
 
 // router.post("/register", async (req, res) => {
 //   // Use Joi to validate client data
