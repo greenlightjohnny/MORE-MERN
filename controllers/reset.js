@@ -67,10 +67,10 @@ exports.reset_post_password = async function (req, res) {
     return res.json(false);
   }
   const { error } = resetVal(req.body);
-  console.log("333", req.body);
+
   // If Joi returns an error, send error message to client and break loop
   if (error) {
-    console.log("4444", error.details[0].message);
+    //console.log("4444", error.details[0].message);
     return res.json({ msg: error.details[0].message });
   }
 
@@ -98,7 +98,7 @@ exports.reset_post_password = async function (req, res) {
     );
     return res.status(200).json({ msg: "Password reset successfully!" });
   } catch (err) {
-    console.log("here", err.message);
+    //console.log("here", err.message);
     res.status(500).json({ error: err.message });
   }
 };

@@ -1,52 +1,56 @@
 const router = require("express").Router();
 const User = require("../models/User");
-const bcrypt = require("bcrypt");
-const { registerVal, loginVal } = require("../util/validation");
-const jwt = require("jsonwebtoken");
+
 const auth = require("../middleware/checkAuth");
 const login_controller = require("../controllers/login");
 const registration_controller = require("../controllers/registration");
 const confirm_controller = require("../controllers/confirm");
 const reset_controller = require("../controllers/reset");
-const sgMail = require("@sendgrid/mail");
-
 const checkToken = require("../middleware/checkToken");
+const delete_controller = require("../controllers/delete");
 
 // ROUTES //
 ///////////
-// Each route takes in the req, res from the client, and uses a callback function to do something with that info
 
 // @public
 // @desc Registration route /api/v1/users/register
-//
-
 router.post("/register", registration_controller.registration);
 
+//@Public
+// @desc login post route
 router.post("/login", login_controller.login);
 
-router.delete("/delete", auth, async (req, res) => {
-  try {
-    const deletedUser = await User.findByIdAndDelete(req.user);
-    console.log(deletedUser);
-    res.status(200).json(deletedUser);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// @private
+// @desc delete user account route
+router.delete("/delete", auth, delete_controller.delete);
 
+// @public
+// @desc auth get route, checks user JWT sent in cookie for each req
 router.get("/auth", checkToken, (req, res) => {
-  console.log("hello", req.cookies);
+  //console.log("hello", req.cookies);
   res.status(200).json(true);
 });
 
+// @public
+// @ desc onfirms/denies email confirmation based on JWT in URL param
 router.get("/confirm/:token", confirm_controller.confirm);
 
+// @private
+// @desc logs the user out by clearing the JWT stored in the client's cookie
 router.post("/logout", (req, res) => {
   res.clearCookie("daisy");
   return res.status(200).send("Logged out");
 });
+
+// @public
+// @desc post route that takes an email address from the client and sends a password reset email to that address if the user is registered.
 router.post("/reset", reset_controller.reset_post);
+
+// @public
+// @desc post route validates token from URL, and validates passwords. If both are true, salts and hashes new password and stores it in the database.
 router.post("/resetform/:token", reset_controller.reset_post_password);
+
+module.exports = router;
 
 // router.post("/register", async (req, res) => {
 //   // Use Joi to validate client data
@@ -230,4 +234,12 @@ router.post("/resetform/:token", reset_controller.reset_post_password);
 
 //// Logout route
 
-module.exports = router;
+// router.delete("/delete", auth, async (req, res) => {
+//   try {
+//     const deletedUser = await User.findByIdAndDelete(req.user);
+//     console.log(deletedUser);
+//     res.status(200).json(deletedUser);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });

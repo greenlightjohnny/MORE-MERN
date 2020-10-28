@@ -4,7 +4,7 @@ const authCheck = (req, res, next) => {
   console.log("any", req.cookies);
   try {
     const token = req.cookies.daisy;
-    console.log("isit", token);
+    //console.log("isit", token);
     if (!token) {
       return res.status(401).send("No token");
     }

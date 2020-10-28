@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 exports.confirm = async function (req, res) {
-  console.log("verr", req.params);
+  //console.log("verr", req.params);
   let token = req.params.token;
   if (!token) {
     return res.json(false);
@@ -36,7 +36,7 @@ exports.confirm = async function (req, res) {
       .status(200)
       .send("Email confirmed! You wil be redirected to the login page");
   } catch (err) {
-    console.log("here", err.message);
+    //console.log("here", err.message);
     res.status(500).json({ error: err.message });
   }
 };
