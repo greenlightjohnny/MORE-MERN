@@ -21,5 +21,14 @@ const loginVal = (data) => {
   return schema.validate(data);
 };
 
+const resetVal = (data) => {
+  const schema = Joi.object({
+    password: Joi.string().min(6).max(1025).required(),
+    confirmpassword: Joi.string().required().valid(Joi.ref("password")),
+  });
+  return schema.validate(data);
+};
+
 module.exports.registerVal = registerVal;
 module.exports.loginVal = loginVal;
+module.exports.resetVal = resetVal;
