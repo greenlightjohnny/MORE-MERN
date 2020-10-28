@@ -20,7 +20,7 @@ exports.reset_post = async function (req, res) {
       from: "totallylegitapp@outlook.com",
       subject: `Totally Legit Password Reset`,
       text: `Click below to confirm your account! ${req.body.email}`,
-      html: `<p> Please click <a href=${process.env.SITE}/reset/${token}>here</a> to reset your totally legit account password</p>`,
+      html: `<p> Please click <a href=${process.env.SITE}/resetform/${token}>here</a> to reset your totally legit account password</p>`,
     };
     sgMail
       .send(msg)
